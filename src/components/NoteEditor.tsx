@@ -15,6 +15,7 @@ import {
 import type { NotesStore } from "../features/notes/notes.store";
 import { formatRelativeTime } from "../features/notes/notes.utils";
 import type { Note } from "../features/notes/notes.types";
+import { useI18n } from "../i18n/useI18n";
 
 type Props = {
   store: NotesStore;
@@ -25,12 +26,13 @@ function normalizeTag(tag: string) {
 }
 
 export function NoteEditor({ store }: Props) {
+  const { t } = useI18n();
   const note = store.selected;
 
   if (!note) {
     return (
       <Box flex="1" p={6} bg="background">
-        <Text variant="muted">Select a note or create a new one.</Text>
+        <Text variant="muted">{t("selectOrCreate")}</Text>
       </Box>
     );
   }
@@ -44,6 +46,7 @@ type InnerProps = {
 };
 
 function NoteEditorInner({ store, note }: InnerProps) {
+  const { t } = useI18n();
   const isTrash = store.state.view === "trash";
 
   const [isEditing, setIsEditing] = useState(false);
@@ -60,23 +63,23 @@ function NoteEditorInner({ store, note }: InnerProps) {
     const noteTags = note.tags ?? [];
     const sameTags =
       noteTags.length === tags.length &&
-      noteTags.every((t, i) => t === tags[i]);
+      noteTags.every((tt, i) => tt === tags[i]);
 
     return !(sameTitle && sameContent && sameTags);
   }, [note, title, content, tags]);
 
   function addTag(raw: string) {
-    const t = normalizeTag(raw);
-    if (!t) return;
+    const tt = normalizeTag(raw);
+    if (!tt) return;
 
-    const exists = tags.some((x) => x.toLowerCase() === t.toLowerCase());
+    const exists = tags.some((x) => x.toLowerCase() === tt.toLowerCase());
     if (exists) return;
 
-    setTags((prev) => [...prev, t]);
+    setTags((prev) => [...prev, tt]);
   }
 
   function removeTag(tag: string) {
-    setTags((prev) => prev.filter((t) => t !== tag));
+    setTags((prev) => prev.filter((tt) => tt !== tag));
   }
 
   function onSave() {
@@ -85,7 +88,7 @@ function NoteEditorInner({ store, note }: InnerProps) {
       payload: {
         id: note.id,
         patch: {
-          title: title.trim() || "Untitled",
+          title: title.trim() || t("untitled"),
           content,
           tags,
         },
@@ -103,6 +106,8 @@ function NoteEditorInner({ store, note }: InnerProps) {
     setTagInput("");
   }
 
+  const timeText = formatRelativeTime(note.updatedAt, t);
+
   return (
     <Box flex="1" p={6} bg="background">
       <Flex justify="space-between" mb={6} gap={6}>
@@ -111,17 +116,17 @@ function NoteEditorInner({ store, note }: InnerProps) {
             <Input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Title"
+              placeholder={t("titlePlaceholder")}
             />
           ) : (
             <Text fontSize="2xl" fontWeight="bold">
-              {note.title || "Untitled"}
+              {note.title || t("untitled")}
             </Text>
           )}
 
           <VStack align="start" spacing={2} w="100%">
             <Text fontSize="sm" variant="muted">
-              Tags
+              {t("tags")}
             </Text>
 
             <HStack spacing={2} wrap="wrap">
@@ -138,7 +143,7 @@ function NoteEditorInner({ store, note }: InnerProps) {
                 <Input
                   value={tagInput}
                   onChange={(e) => setTagInput(e.target.value)}
-                  placeholder="Add tag and press Enter"
+                  placeholder={t("addTagPlaceholder")}
                   size="sm"
                   w="240px"
                   onKeyDown={(e) => {
@@ -160,7 +165,7 @@ function NoteEditorInner({ store, note }: InnerProps) {
           </VStack>
 
           <Text fontSize="sm" variant="muted">
-            Last edited: {formatRelativeTime(note.updatedAt)}
+            {t("lastEdited", { time: timeText })}
           </Text>
         </VStack>
 
@@ -174,7 +179,7 @@ function NoteEditorInner({ store, note }: InnerProps) {
                 })
               }
             >
-              {note.archived ? "Unarchive" : "Archive note"}
+              {note.archived ? t("unarchive") : t("archiveNote")}
             </Button>
           )}
 
@@ -188,7 +193,7 @@ function NoteEditorInner({ store, note }: InnerProps) {
                 })
               }
             >
-              Delete note
+              {t("deleteNote")}
             </Button>
           ) : (
             <>
@@ -197,7 +202,7 @@ function NoteEditorInner({ store, note }: InnerProps) {
                   store.dispatch({ type: "RESTORE", payload: { id: note.id } })
                 }
               >
-                Restore
+                {t("restore")}
               </Button>
 
               <Button
@@ -209,7 +214,7 @@ function NoteEditorInner({ store, note }: InnerProps) {
                   })
                 }
               >
-                Delete forever
+                {t("deleteForever")}
               </Button>
             </>
           )}
@@ -220,27 +225,27 @@ function NoteEditorInner({ store, note }: InnerProps) {
         <Textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          placeholder="Write your note..."
+          placeholder={t("contentPlaceholder")}
           minH="280px"
         />
       ) : (
         <Text color="neutral.800" mb={10} whiteSpace="pre-wrap">
-          {note.content || "No content yet."}
+          {note.content || t("noContentYet")}
         </Text>
       )}
 
       <Flex gap={3} mt={6}>
         {!isTrash && !isEditing && (
-          <Button onClick={() => setIsEditing(true)}>Edit</Button>
+          <Button onClick={() => setIsEditing(true)}>{t("edit")}</Button>
         )}
 
         {!isTrash && isEditing && (
           <>
             <Button onClick={onSave} isDisabled={!hasChanges}>
-              Save
+              {t("save")}
             </Button>
             <Button variant="outline" onClick={onCancel}>
-              Cancel
+              {t("cancel")}
             </Button>
           </>
         )}

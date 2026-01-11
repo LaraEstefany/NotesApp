@@ -2,15 +2,16 @@ import { Box, Button, VStack, Text } from "@chakra-ui/react";
 import { NoteCard } from "./NoteCard";
 import type { NotesStore } from "../features/notes/notes.store";
 import type { Note } from "../features/notes/notes.types";
+import { useI18n } from "../i18n/useI18n";
 
 type Props = {
   store: NotesStore;
 };
 
-function createEmptyNote(): Note {
+function createEmptyNote(untitled: string): Note {
   return {
     id: crypto.randomUUID(),
-    title: "Untitled",
+    title: untitled,
     content: "",
     tags: [],
     archived: false,
@@ -20,6 +21,8 @@ function createEmptyNote(): Note {
 }
 
 export function NotesList({ store }: Props) {
+  const { t } = useI18n();
+
   return (
     <Box
       w="320px"
@@ -32,16 +35,16 @@ export function NotesList({ store }: Props) {
         w="100%"
         mb={4}
         onClick={() => {
-          const note = createEmptyNote();
+          const note = createEmptyNote(t("untitled"));
           store.dispatch({ type: "CREATE", payload: { note } });
         }}
       >
-        + Create new note
+        {t("createNewNote")}
       </Button>
 
       {store.visibleNotes.length === 0 ? (
         <Text variant="muted" fontSize="sm">
-          No notes found.
+          {t("noNotesFound")}
         </Text>
       ) : (
         <VStack spacing={2} align="stretch">

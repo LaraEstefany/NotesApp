@@ -1,17 +1,21 @@
-import { Flex, Input, Text, IconButton, HStack } from "@chakra-ui/react";
+import { Flex, Input, Text, HStack } from "@chakra-ui/react";
 import type { NotesStore } from "../features/notes/notes.store";
+import { useI18n } from "../i18n/useI18n";
+import { LanguageMenu } from "./LanguageMenu";
 
 type Props = {
   store: NotesStore;
 };
 
 export function NotesHeader({ store }: Props) {
+  const { t } = useI18n();
+
   const title =
     store.state.view === "archived"
-      ? "Archived Notes"
+      ? t("archivedNotes")
       : store.state.view === "trash"
-      ? "Trash"
-      : "All Notes";
+      ? t("trash")
+      : t("allNotes");
 
   return (
     <Flex
@@ -29,7 +33,7 @@ export function NotesHeader({ store }: Props) {
 
       <HStack spacing={2}>
         <Input
-          placeholder="Search..."
+          placeholder={t("searchPlaceholder")}
           w="260px"
           value={store.state.query}
           onChange={(e) =>
@@ -39,11 +43,8 @@ export function NotesHeader({ store }: Props) {
             })
           }
         />
-        <IconButton
-          aria-label="Change language"
-          icon={<span>🌐</span>}
-          variant="ghost"
-        />
+
+        <LanguageMenu />
       </HStack>
     </Flex>
   );

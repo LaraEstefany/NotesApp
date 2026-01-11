@@ -1,6 +1,7 @@
 import { Box, Text, HStack, Badge, VStack } from "@chakra-ui/react";
 import type { Note } from "../features/notes/notes.types";
 import { formatRelativeTime } from "../features/notes/notes.utils";
+import { useI18n } from "../i18n/useI18n";
 
 type NoteCardProps = {
   note: Note;
@@ -9,6 +10,8 @@ type NoteCardProps = {
 };
 
 export function NoteCard({ note, isActive = false, onSelect }: NoteCardProps) {
+  const { t } = useI18n();
+
   const isArchived = note.archived && !note.deletedAt;
   const isTrash = !!note.deletedAt;
 
@@ -26,18 +29,18 @@ export function NoteCard({ note, isActive = false, onSelect }: NoteCardProps) {
       <VStack align="start" spacing={1}>
         <HStack w="100%" justify="space-between">
           <Text fontWeight="medium" noOfLines={1}>
-            {note.title || "Untitled"}
+            {note.title || t("untitled")}
           </Text>
 
           {isArchived && (
             <Badge variant="brand" fontSize="0.65rem">
-              Archived
+              {t("statusArchived")}
             </Badge>
           )}
 
           {isTrash && (
             <Badge variant="accent" fontSize="0.65rem">
-              Trash
+              {t("statusTrash")}
             </Badge>
           )}
         </HStack>
@@ -53,7 +56,7 @@ export function NoteCard({ note, isActive = false, onSelect }: NoteCardProps) {
         )}
 
         <Text fontSize="xs" color="neutral.700">
-          {formatRelativeTime(note.updatedAt)}
+          {formatRelativeTime(note.updatedAt, t)}
         </Text>
       </VStack>
     </Box>

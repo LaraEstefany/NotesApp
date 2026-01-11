@@ -1,11 +1,14 @@
 import { Box, VStack, Text, Divider, Button } from "@chakra-ui/react";
 import type { NotesStore, NotesView } from "../features/notes/notes.store";
+import { useI18n } from "../i18n/useI18n";
 
 type Props = {
   store: NotesStore;
 };
 
 export function Sidebar({ store }: Props) {
+  const { t } = useI18n();
+
   const setView = (view: NotesView) =>
     store.dispatch({ type: "SET_VIEW", payload: { view } });
 
@@ -21,7 +24,7 @@ export function Sidebar({ store }: Props) {
       bg="background"
     >
       <Text fontSize="xl" fontWeight="bold" mb={6}>
-        📝 NotesApp
+        📝 {t("appName")}
       </Text>
 
       <VStack align="stretch" spacing={2}>
@@ -30,7 +33,7 @@ export function Sidebar({ store }: Props) {
           justifyContent="flex-start"
           onClick={() => setView("all")}
         >
-          All notes
+          {t("allNotes")}
         </Button>
 
         <Button
@@ -38,7 +41,7 @@ export function Sidebar({ store }: Props) {
           justifyContent="flex-start"
           onClick={() => setView("archived")}
         >
-          Archived notes
+          {t("archivedNotes")}
         </Button>
 
         <Button
@@ -46,7 +49,7 @@ export function Sidebar({ store }: Props) {
           justifyContent="flex-start"
           onClick={() => setView("trash")}
         >
-          Trash
+          {t("trash")}
         </Button>
       </VStack>
 
@@ -54,7 +57,7 @@ export function Sidebar({ store }: Props) {
 
       <VStack align="stretch" spacing={2}>
         <Text fontSize="sm" color="neutral.700">
-          Tags
+          {t("tags")}
         </Text>
 
         <Button
@@ -63,12 +66,12 @@ export function Sidebar({ store }: Props) {
           justifyContent="flex-start"
           onClick={() => setTag(null)}
         >
-          All tags
+          {t("allTags")}
         </Button>
 
         {store.allTags.length === 0 ? (
           <Text fontSize="sm" color="neutral.700">
-            No tags yet
+            {t("noTagsYet")}
           </Text>
         ) : (
           store.allTags.map((tag) => (
