@@ -1,7 +1,7 @@
 import { AppShell } from "./app/AppShell";
+import { useNotesStore } from "./features/notes/notes.store";
 
-function App() {
-  return <AppShell />;
+export default function App() {
+  const store = useNotesStore();
+  return <AppShell store={store} />;
 }
-
-export default App;

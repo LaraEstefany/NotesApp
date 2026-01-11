@@ -1,6 +1,18 @@
-import { Flex, Input, Text, IconButton } from "@chakra-ui/react";
+import { Flex, Input, Text, IconButton, HStack } from "@chakra-ui/react";
+import type { NotesStore } from "../features/notes/notes.store";
 
-export function NotesHeader() {
+type Props = {
+  store: NotesStore;
+};
+
+export function NotesHeader({ store }: Props) {
+  const title =
+    store.state.view === "archived"
+      ? "Archived Notes"
+      : store.state.view === "trash"
+      ? "Trash"
+      : "All Notes";
+
   return (
     <Flex
       align="center"
@@ -8,20 +20,31 @@ export function NotesHeader() {
       px={6}
       py={4}
       borderBottom="1px solid"
-      borderColor="gray.200"
+      borderColor="neutral.200"
+      bg="background"
     >
       <Text fontSize="xl" fontWeight="bold">
-        All Notes
+        {title}
       </Text>
 
-      <Flex gap={2} align="center">
-        <Input placeholder="Search..." size="sm" w="240px" />
+      <HStack spacing={2}>
+        <Input
+          placeholder="Search..."
+          w="260px"
+          value={store.state.query}
+          onChange={(e) =>
+            store.dispatch({
+              type: "SET_QUERY",
+              payload: { query: e.target.value },
+            })
+          }
+        />
         <IconButton
           aria-label="Change language"
           icon={<span>🌐</span>}
-          size="sm"
+          variant="ghost"
         />
-      </Flex>
+      </HStack>
     </Flex>
   );
 }
