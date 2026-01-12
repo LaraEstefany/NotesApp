@@ -118,4 +118,5 @@ http://localhost:5173
 ## Author
 
 Developed by Lara Costa
-Frontend Developer — React, TypeScript, UX-focused
+
+Frontend Developer | React, TypeScript, UX-focused
