@@ -1,7 +1,11 @@
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
+  Badge,
   Box,
   Button,
+  Editable,
+  EditableInput,
+  EditablePreview,
   Flex,
   HStack,
   Input,
@@ -9,20 +13,35 @@ import {
   TagCloseButton,
   TagLabel,
   Text,
-  Textarea,
   VStack,
 } from "@chakra-ui/react";
 import type { NotesStore } from "../features/notes/notes.store";
 import { formatRelativeTime } from "../features/notes/notes.utils";
 import type { Note } from "../features/notes/notes.types";
 import { useI18n } from "../i18n/useI18n";
+import { RichTextEditor } from "./RichTextEditor";
 
-type Props = {
-  store: NotesStore;
-};
+type Props = { store: NotesStore };
+type NotePatch = Partial<Pick<Note, "title" | "content" | "tags">>;
 
 function normalizeTag(tag: string) {
   return tag.trim().replace(/\s+/g, " ");
+}
+
+function debounce<Args extends readonly unknown[]>(
+  fn: (...args: Args) => void,
+  wait = 350
+) {
+  let t: number | undefined;
+
+  const debounced = (...args: Args) => {
+    window.clearTimeout(t);
+    t = window.setTimeout(() => fn(...args), wait);
+  };
+
+  debounced.cancel = () => window.clearTimeout(t);
+
+  return debounced;
 }
 
 export function NoteEditor({ store }: Props) {
@@ -40,33 +59,39 @@ export function NoteEditor({ store }: Props) {
   return <NoteEditorInner key={note.id} store={store} note={note} />;
 }
 
-type InnerProps = {
-  store: NotesStore;
-  note: Note;
-};
+type InnerProps = { store: NotesStore; note: Note };
 
 function NoteEditorInner({ store, note }: InnerProps) {
   const { t } = useI18n();
   const isTrash = store.state.view === "trash";
-
-  const [isEditing, setIsEditing] = useState(false);
 
   const [title, setTitle] = useState(note.title ?? "");
   const [content, setContent] = useState(note.content ?? "");
   const [tags, setTags] = useState<string[]>(note.tags ?? []);
   const [tagInput, setTagInput] = useState("");
 
-  const hasChanges = useMemo(() => {
-    const sameTitle = (note.title ?? "") === title;
-    const sameContent = (note.content ?? "") === content;
+  const lastSavedRef = useRef({
+    title: note.title ?? "",
+    content: note.content ?? "",
+    tagsKey: (note.tags ?? []).join("|"),
+  });
 
-    const noteTags = note.tags ?? [];
-    const sameTags =
-      noteTags.length === tags.length &&
-      noteTags.every((tt, i) => tt === tags[i]);
+  const savePatchNow = useCallback(
+    (patch: NotePatch) => {
+      store.dispatch({ type: "UPDATE", payload: { id: note.id, patch } });
+    },
+    [store, note.id]
+  );
 
-    return !(sameTitle && sameContent && sameTags);
-  }, [note, title, content, tags]);
+  const savePatchDebounced = useMemo(() => {
+    return debounce<[NotePatch]>((patch) => savePatchNow(patch), 350);
+  }, [savePatchNow]);
+
+  useEffect(() => {
+    return () => {
+      savePatchDebounced.cancel?.();
+    };
+  }, [savePatchDebounced]);
 
   function addTag(raw: string) {
     const tt = normalizeTag(raw);
@@ -75,103 +100,94 @@ function NoteEditorInner({ store, note }: InnerProps) {
     const exists = tags.some((x) => x.toLowerCase() === tt.toLowerCase());
     if (exists) return;
 
-    setTags((prev) => [...prev, tt]);
+    const next = [...tags, tt];
+    setTags(next);
+    lastSavedRef.current.tagsKey = next.join("|");
+    savePatchNow({ tags: next });
   }
 
   function removeTag(tag: string) {
-    setTags((prev) => prev.filter((tt) => tt !== tag));
-  }
-
-  function onSave() {
-    store.dispatch({
-      type: "UPDATE",
-      payload: {
-        id: note.id,
-        patch: {
-          title: title.trim() || t("untitled"),
-          content,
-          tags,
-        },
-      },
-    });
-
-    setIsEditing(false);
-  }
-
-  function onCancel() {
-    setIsEditing(false);
-    setTitle(note.title ?? "");
-    setContent(note.content ?? "");
-    setTags(note.tags ?? []);
-    setTagInput("");
+    const next = tags.filter((tt) => tt !== tag);
+    setTags(next);
+    lastSavedRef.current.tagsKey = next.join("|");
+    savePatchNow({ tags: next });
   }
 
   const timeText = formatRelativeTime(note.updatedAt, t);
 
   return (
-    <Box flex="1" p={6} bg="background">
-      <Flex justify="space-between" mb={6} gap={6}>
-        <VStack align="start" spacing={2} flex="1">
-          {isEditing ? (
-            <Input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder={t("titlePlaceholder")}
-            />
-          ) : (
+    <Box flex="1" p={6} bg="background" display="flex" flexDir="column" gap={4}>
+      <Flex justify="space-between" align="flex-start" gap={4} flexWrap="wrap">
+        <VStack align="start" spacing={2} flex="1" minW="260px">
+          {isTrash ? (
             <Text fontSize="2xl" fontWeight="bold">
               {note.title || t("untitled")}
             </Text>
+          ) : (
+            <Editable
+              value={title}
+              onChange={(next) => {
+                setTitle(next);
+                const normalized = next.trim() || t("untitled");
+                if (lastSavedRef.current.title === normalized) return;
+                lastSavedRef.current.title = normalized;
+                savePatchDebounced({ title: normalized });
+              }}
+              submitOnBlur
+              selectAllOnFocus
+              onSubmit={(next) => {
+                const normalized = next.trim() || t("untitled");
+                setTitle(normalized);
+                lastSavedRef.current.title = normalized;
+                savePatchNow({ title: normalized });
+              }}
+            >
+              <EditablePreview
+                fontSize="2xl"
+                fontWeight="bold"
+                lineHeight="short"
+                py={1}
+                px={2}
+                borderRadius="md"
+                bg="transparent"
+                _hover={{ bg: "surface" }}
+              />
+              <EditableInput
+                fontSize="2xl"
+                fontWeight="bold"
+                lineHeight="short"
+                py={1}
+                px={2}
+                borderRadius="md"
+                border="1px solid"
+                borderColor="border"
+                bg="surface"
+                _focusVisible={{
+                  outline: "none",
+                  boxShadow: "0 0 0 1px var(--chakra-colors-primary)",
+                }}
+              />
+            </Editable>
           )}
 
-          <VStack align="start" spacing={2} w="100%">
-            <Text fontSize="sm" variant="muted">
-              {t("tags")}
-            </Text>
-
-            <HStack spacing={2} wrap="wrap">
-              {(isEditing ? tags : note.tags).map((tag) => (
-                <Tag key={tag} variant="subtle">
-                  <TagLabel>{tag}</TagLabel>
-                  {isEditing && (
-                    <TagCloseButton onClick={() => removeTag(tag)} />
-                  )}
-                </Tag>
-              ))}
-
-              {isEditing && (
-                <Input
-                  value={tagInput}
-                  onChange={(e) => setTagInput(e.target.value)}
-                  placeholder={t("addTagPlaceholder")}
-                  size="sm"
-                  w="240px"
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === ",") {
-                      e.preventDefault();
-                      addTag(tagInput);
-                      setTagInput("");
-                    }
-                  }}
-                  onBlur={() => {
-                    if (tagInput.trim()) {
-                      addTag(tagInput);
-                      setTagInput("");
-                    }
-                  }}
-                />
-              )}
-            </HStack>
-          </VStack>
-
-          <Text fontSize="sm" variant="muted">
-            {t("lastEdited", { time: timeText })}
-          </Text>
+          <HStack spacing={2} flexWrap="wrap">
+            {note.archived && !note.deletedAt && (
+              <Badge variant="brand" fontSize="0.7rem">
+                {t("statusArchived")}
+              </Badge>
+            )}
+            {note.deletedAt && (
+              <Badge variant="accent" fontSize="0.7rem">
+                {t("statusTrash")}
+              </Badge>
+            )}
+          </HStack>
         </VStack>
 
-        <VStack align="stretch">
+        <HStack spacing={2} align="center">
           {!isTrash && (
             <Button
+              variant="outline"
               onClick={() =>
                 store.dispatch({
                   type: "ARCHIVE_TOGGLE",
@@ -185,7 +201,7 @@ function NoteEditorInner({ store, note }: InnerProps) {
 
           {!isTrash ? (
             <Button
-              variant="outline"
+              variant="danger"
               onClick={() =>
                 store.dispatch({
                   type: "SOFT_DELETE",
@@ -198,6 +214,7 @@ function NoteEditorInner({ store, note }: InnerProps) {
           ) : (
             <>
               <Button
+                variant="outline"
                 onClick={() =>
                   store.dispatch({ type: "RESTORE", payload: { id: note.id } })
                 }
@@ -218,37 +235,111 @@ function NoteEditorInner({ store, note }: InnerProps) {
               </Button>
             </>
           )}
-        </VStack>
+        </HStack>
       </Flex>
 
-      {isEditing ? (
-        <Textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          placeholder={t("contentPlaceholder")}
-          minH="280px"
-        />
+      {isTrash ? (
+        <Box
+          border="1px solid"
+          borderColor="border"
+          bg="surface"
+          borderRadius="md"
+          p={4}
+        >
+          <Box
+            className="note-preview"
+            dangerouslySetInnerHTML={{
+              __html: note.content || `<p>${t("noContentYet")}</p>`,
+            }}
+          />
+        </Box>
       ) : (
-        <Text color="textPrimary" mb={10} whiteSpace="pre-wrap">
-          {note.content || t("noContentYet")}
-        </Text>
+        <RichTextEditor
+          value={content}
+          onChange={(html) => {
+            setContent(html);
+            if (lastSavedRef.current.content === html) return;
+            lastSavedRef.current.content = html;
+            savePatchDebounced({ content: html });
+          }}
+          placeholder={t("contentPlaceholder")}
+          minH="260px"
+          maxH="67vh"
+        />
       )}
 
-      <Flex gap={3} mt={6}>
-        {!isTrash && !isEditing && (
-          <Button onClick={() => setIsEditing(true)}>{t("edit")}</Button>
-        )}
+      <Flex
+        justify="space-between"
+        align="center"
+        gap={3}
+        flexWrap="wrap"
+        pt={2}
+      >
+        <HStack spacing={2} wrap="wrap" align="center" flex="1" minW="260px">
+          <Text fontSize="sm" variant="muted">
+            {t("tags")}
+          </Text>
 
-        {!isTrash && isEditing && (
-          <>
-            <Button onClick={onSave} isDisabled={!hasChanges}>
-              {t("save")}
-            </Button>
-            <Button variant="outline" onClick={onCancel}>
-              {t("cancel")}
-            </Button>
-          </>
-        )}
+          {tags.map((tag) => (
+            <Tag key={tag} variant="subtle">
+              <TagLabel>{tag}</TagLabel>
+              {!isTrash && <TagCloseButton onClick={() => removeTag(tag)} />}
+            </Tag>
+          ))}
+
+          {!isTrash && (
+            <Box minW="160px" flex="1" maxW="360px">
+              <Input
+                value={tagInput}
+                onChange={(e) => setTagInput(e.target.value)}
+                placeholder={t("addTagPlaceholder")}
+                variant="unstyled"
+                w="100%"
+                px={2}
+                py={1}
+                borderRadius="md"
+                bg="transparent"
+                _hover={{ bg: "surface" }}
+                _focus={{
+                  bg: "surface",
+                  boxShadow: "0 0 0 1px var(--chakra-colors-primary)",
+                }}
+                sx={{
+                  overflow: "visible",
+                  textOverflow: "clip",
+                  whiteSpace: "nowrap",
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === ",") {
+                    e.preventDefault();
+                    if (tagInput.trim()) {
+                      addTag(tagInput);
+                      setTagInput("");
+                    }
+                    return;
+                  }
+
+                  if (e.key === "Backspace" && !tagInput && tags.length) {
+                    const next = tags.slice(0, -1);
+                    setTags(next);
+                    lastSavedRef.current.tagsKey = next.join("|");
+                    savePatchNow({ tags: next });
+                  }
+                }}
+                onBlur={() => {
+                  if (tagInput.trim()) {
+                    addTag(tagInput);
+                    setTagInput("");
+                  }
+                }}
+              />
+            </Box>
+          )}
+        </HStack>
+
+        <Text fontSize="sm" variant="muted" whiteSpace="nowrap">
+          {t("lastEdited", { time: timeText })}
+        </Text>
       </Flex>
     </Box>
   );
