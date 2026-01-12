@@ -15,7 +15,7 @@ export const Button: ComponentStyleConfig = {
       bg: "primary",
       color: "white",
       _hover: { bg: "primaryHover" },
-      _active: { bg: "brand.900" },
+      _active: { bg: "primaryHover" },
       _disabled: {
         opacity: 0.6,
         cursor: "not-allowed",
@@ -25,22 +25,22 @@ export const Button: ComponentStyleConfig = {
     outline: {
       bg: "transparent",
       border: "1px solid",
-      borderColor: "neutral.200",
+      borderColor: "border",
       color: "textPrimary",
-      _hover: { bg: "neutral.100" },
-      _active: { bg: "neutral.200" },
+      _hover: { bg: "hoverBg" },
+      _active: { bg: "subtleBg" },
     },
     ghost: {
       bg: "transparent",
       color: "textPrimary",
-      _hover: { bg: "neutral.100" },
-      _active: { bg: "neutral.200" },
+      _hover: { bg: "hoverBg" },
+      _active: { bg: "subtleBg" },
     },
     danger: {
       bg: "danger",
       color: "white",
-      _hover: { bg: "accent.400" },
-      _active: { bg: "accent.300" },
+      _hover: { bg: { default: "accent.400", _dark: "accent.200" } },
+      _active: { bg: { default: "accent.300", _dark: "accent.100" } },
     },
   },
   defaultProps: {

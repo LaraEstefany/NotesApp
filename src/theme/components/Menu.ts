@@ -5,14 +5,14 @@ export const Menu: ComponentStyleConfig = {
     list: {
       borderRadius: "md",
       border: "1px solid",
-      borderColor: "neutral.200",
+      borderColor: "border",
       bg: "background",
       p: 1,
     },
     item: {
       borderRadius: "md",
-      _hover: { bg: "neutral.100" },
-      _focus: { bg: "neutral.100" },
+      _hover: { bg: "hoverBg" },
+      _focus: { bg: "hoverBg" },
     },
   },
 };

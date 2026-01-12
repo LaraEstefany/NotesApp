@@ -229,7 +229,7 @@ function NoteEditorInner({ store, note }: InnerProps) {
           minH="280px"
         />
       ) : (
-        <Text color="neutral.800" mb={10} whiteSpace="pre-wrap">
+        <Text color="textPrimary" mb={10} whiteSpace="pre-wrap">
           {note.content || t("noContentYet")}
         </Text>
       )}

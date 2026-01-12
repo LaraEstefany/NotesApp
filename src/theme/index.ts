@@ -1,4 +1,4 @@
-import { extendTheme } from "@chakra-ui/react";
+import { extendTheme, type ThemeConfig } from "@chakra-ui/react";
 import { colors } from "./foundations/colors";
 import { semanticTokens } from "./foundations/semanticTokens";
 
@@ -15,7 +15,13 @@ import { Button } from "./components/Button";
 import { Input } from "./components/Input";
 import { Badge } from "./components/Badge";
 
+const config: ThemeConfig = {
+  initialColorMode: "light",
+  useSystemColorMode: true,
+};
+
 export const theme = extendTheme({
+  config,
   fonts,
   colors,
   semanticTokens,

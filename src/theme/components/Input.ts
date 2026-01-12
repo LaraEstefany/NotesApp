@@ -9,10 +9,10 @@ export const Input: ComponentStyleConfig = {
     outline: {
       field: {
         bg: "surface",
-        borderColor: "neutral.200",
+        borderColor: "border",
         color: "textPrimary",
-        _placeholder: { color: "neutral.600" },
-        _hover: { borderColor: "neutral.300" },
+        _placeholder: { color: "placeholder" },
+        _hover: { borderColor: "textSecondary" },
         _focus: {
           borderColor: "primary",
           boxShadow: "0 0 0 1px var(--chakra-colors-primary)",

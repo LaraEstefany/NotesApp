@@ -19,7 +19,7 @@ export function Sidebar({ store }: Props) {
     <Box
       w="260px"
       borderRight="1px solid"
-      borderColor="neutral.200"
+      borderColor="border"
       p={4}
       bg="background"
     >
@@ -56,7 +56,7 @@ export function Sidebar({ store }: Props) {
       <Divider my={6} />
 
       <VStack align="stretch" spacing={2}>
-        <Text fontSize="sm" color="neutral.700">
+        <Text fontSize="sm" color="textSecondary">
           {t("tags")}
         </Text>
 
@@ -70,7 +70,7 @@ export function Sidebar({ store }: Props) {
         </Button>
 
         {store.allTags.length === 0 ? (
-          <Text fontSize="sm" color="neutral.700">
+          <Text fontSize="sm" color="textSecondary">
             {t("noTagsYet")}
           </Text>
         ) : (

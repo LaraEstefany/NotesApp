@@ -7,7 +7,7 @@ export const Modal: ComponentStyleConfig = {
       bg: "background",
       color: "textPrimary",
       border: "1px solid",
-      borderColor: "neutral.200",
+      borderColor: "border",
     },
     header: {
       fontWeight: "bold",
@@ -15,7 +15,7 @@ export const Modal: ComponentStyleConfig = {
     },
     closeButton: {
       borderRadius: "md",
-      _hover: { bg: "neutral.100" },
+      _hover: { bg: "hoverBg" },
     },
   },
 };

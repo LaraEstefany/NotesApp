@@ -20,11 +20,11 @@ export function NoteCard({ note, isActive = false, onSelect }: NoteCardProps) {
       p={3}
       borderRadius="md"
       bg={isActive ? "surface" : "transparent"}
-      _hover={{ bg: "neutral.100" }}
+      _hover={{ bg: "surface" }}
       cursor="pointer"
       onClick={() => onSelect(note.id)}
       border="1px solid"
-      borderColor={isActive ? "neutral.300" : "transparent"}
+      borderColor={isActive ? "border" : "transparent"}
     >
       <VStack align="start" spacing={1}>
         <HStack w="100%" justify="space-between">
@@ -55,7 +55,7 @@ export function NoteCard({ note, isActive = false, onSelect }: NoteCardProps) {
           </HStack>
         )}
 
-        <Text fontSize="xs" color="neutral.700">
+        <Text fontSize="xs" color="textSecondary">
           {formatRelativeTime(note.updatedAt, t)}
         </Text>
       </VStack>

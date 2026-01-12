@@ -1,7 +1,15 @@
-import { Flex, Input, Text, HStack } from "@chakra-ui/react";
+import {
+  Flex,
+  Input,
+  InputGroup,
+  InputLeftElement,
+  Text,
+  HStack,
+} from "@chakra-ui/react";
 import type { NotesStore } from "../features/notes/notes.store";
 import { useI18n } from "../i18n/useI18n";
 import { LanguageMenu } from "./LanguageMenu";
+import { ColorModeToggle } from "./ColorModeToggle";
 
 type Props = {
   store: NotesStore;
@@ -24,7 +32,7 @@ export function NotesHeader({ store }: Props) {
       px={6}
       py={4}
       borderBottom="1px solid"
-      borderColor="neutral.200"
+      borderColor="border"
       bg="background"
     >
       <Text fontSize="xl" fontWeight="bold">
@@ -32,19 +40,25 @@ export function NotesHeader({ store }: Props) {
       </Text>
 
       <HStack spacing={2}>
-        <Input
-          placeholder={t("searchPlaceholder")}
-          w="260px"
-          value={store.state.query}
-          onChange={(e) =>
-            store.dispatch({
-              type: "SET_QUERY",
-              payload: { query: e.target.value },
-            })
-          }
-        />
+        <InputGroup w={{ base: "180px", md: "260px" }}>
+          <InputLeftElement pointerEvents="none" opacity={0.7}>
+            <span>🔎</span>
+          </InputLeftElement>
+
+          <Input
+            placeholder={t("searchPlaceholder")}
+            value={store.state.query}
+            onChange={(e) =>
+              store.dispatch({
+                type: "SET_QUERY",
+                payload: { query: e.target.value },
+              })
+            }
+          />
+        </InputGroup>
 
         <LanguageMenu />
+        <ColorModeToggle />
       </HStack>
     </Flex>
   );

@@ -9,16 +9,16 @@ export const IconButton: ComponentStyleConfig = {
     ghost: {
       bg: "transparent",
       color: "textPrimary",
-      _hover: { bg: "neutral.100" },
-      _active: { bg: "neutral.200" },
+      _hover: { bg: "hoverBg" },
+      _active: { bg: "subtleBg" },
     },
     outline: {
       bg: "transparent",
       border: "1px solid",
-      borderColor: "neutral.200",
+      borderColor: "border",
       color: "textPrimary",
-      _hover: { bg: "neutral.100" },
-      _active: { bg: "neutral.200" },
+      _hover: { bg: "hoverBg" },
+      _active: { bg: "subtleBg" },
     },
   },
   defaultProps: {

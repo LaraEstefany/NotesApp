@@ -10,16 +10,16 @@ export const Badge: ComponentStyleConfig = {
   },
   variants: {
     subtle: {
-      bg: "neutral.200",
+      bg: "subtleBg",
       color: "textSecondary",
     },
     brand: {
-      bg: "brand.100",
-      color: "brand.900",
+      bg: { default: "brand.100", _dark: "brand.700" },
+      color: { default: "brand.900", _dark: "neutral.50" },
     },
     accent: {
-      bg: "accent.100",
-      color: "brand.900",
+      bg: { default: "accent.100", _dark: "accent.300" },
+      color: { default: "brand.900", _dark: "brand.900" },
     },
   },
   defaultProps: {

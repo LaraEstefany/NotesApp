@@ -1,6 +1,7 @@
-import type { ComponentStyleConfig } from "@chakra-ui/react";
+import type { ComponentMultiStyleConfig } from "@chakra-ui/react";
 
-export const Tag: ComponentStyleConfig = {
+export const Tag: ComponentMultiStyleConfig = {
+  parts: ["container", "label", "closeButton"],
   baseStyle: {
     container: {
       borderRadius: "full",
@@ -9,13 +10,19 @@ export const Tag: ComponentStyleConfig = {
   },
   variants: {
     subtle: {
-      container: { bg: "neutral.200", color: "textSecondary" },
+      container: { bg: "subtleBg", color: "textSecondary" },
     },
     brand: {
-      container: { bg: "brand.100", color: "brand.900" },
+      container: {
+        bg: { default: "brand.100", _dark: "brand.700" },
+        color: { default: "brand.900", _dark: "neutral.50" },
+      },
     },
     accent: {
-      container: { bg: "accent.100", color: "brand.900" },
+      container: {
+        bg: { default: "accent.100", _dark: "accent.300" },
+        color: { default: "brand.900", _dark: "brand.900" },
+      },
     },
   },
   defaultProps: {

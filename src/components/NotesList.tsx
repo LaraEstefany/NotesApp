@@ -27,7 +27,7 @@ export function NotesList({ store }: Props) {
     <Box
       w="320px"
       borderRight="1px solid"
-      borderColor="neutral.200"
+      borderColor="border"
       p={4}
       bg="background"
     >

@@ -6,7 +6,7 @@ export const Text: ComponentStyleConfig = {
   },
   variants: {
     muted: {
-      color: "neutral.700",
+      color: "muted",
     },
     subtle: {
       color: "textSecondary",
