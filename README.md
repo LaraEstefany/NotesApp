@@ -1,73 +1,121 @@
-# React + TypeScript + Vite
+# NotesApp
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+NotesApp is a modern note-taking application built with React, TypeScript and Vite, designed to provide a smooth, intuitive and productive user experience similar to popular note apps.
 
-Currently, two official plugins are available:
+This project was developed as part of a frontend technical challenge, focusing on UX, code quality, business logic and delivery.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## React Compiler
+### Core Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Create, edit and manage notes
+- Inline editing (title, content and tags)
+- Rich text editor (bold, italic, underline, strikethrough)
+- Checklists with interactive checkboxes
+- Add emojis to notes
+- Tag management (add, remove, filter)
+- Search notes by text or tags
+- Archive and unarchive notes
+- Soft delete (trash) and permanent delete
+- Local persistence using LocalStorage
+- Responsive and accessible UI
 
-## Expanding the ESLint configuration
+### UX & UI
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Clean and modern layout
+- Light and Dark mode
+- Auto-save with debounce
+- Click-to-edit interaction
+- Scrollable editor
+- Smart tag input
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Internationalization (i18n)
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Multi-language support:
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- English
+- Portuguese (Brazil)
+- Spanish
+- French
+
+Language switcher with flags.
+
+## Tech Stack
+
+- React 18
+- TypeScript
+- Vite
+- Chakra UI (design system)
+- Tiptap (rich text editor)
+- ESLint (code quality)
+- LocalStorage (data persistence)
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js >= 20.19
+- npm or yarn
+
+### Installation
+
+```bash
+git clone git@github.com:LaraEstefany/NotesApp.git
+cd NotesApp
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Run the project
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run dev
 ```
+
+### Open your browser at:
+
+```bash
+http://localhost:5173
+```
+
+## Code Quality
+
+- Strict TypeScript configuration
+- ESLint with type-aware rules
+- Modular and scalable architecture
+- Clear separation of concerns
+
+## Challenge Checklist
+
+### Minimum Requirements
+
+- Public repository
+- React + TypeScript
+- Fully functional application
+- Pleasant and modern UI
+- README with instructions
+
+### Optional Requirements
+
+- Code quality (ESLint)
+
+## Design Decisions
+
+- Inline editing was chosen to mimic real-world note apps and improve UX
+- LocalStorage replaces a backend to keep the app fully client-side
+- Debounced auto-save avoids excessive state updates
+- Chakra UI with a custom theme ensures design consistency
+- Tiptap enables advanced text features while keeping control over HTML output
+
+## Possible Improvements
+
+- Unit and integration tests
+- Animations and transitions
+- Drag and drop reordering
+- Note sharing
+- Export notes
+- Backend integration
+
+## Author
+
+Developed by Lara Costa
+Frontend Developer — React, TypeScript, UX-focused
